@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="배송원들을 2인 1팀으로 구성하여 금천구의 5~7개 구역에 무작위로 매칭해주는 시각적이고 세련된 배송 매칭 시스템입니다.">
+  <title>랜덤 배송 매칭 시스템 - Delivery Matcher</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;600;800&display=swap" rel="stylesheet">
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-container">
+    
+    <!-- Background Elements for Premium Glow -->
+    <div class="glow-sphere glow-sphere-1"></div>
+    <div class="glow-sphere glow-sphere-2"></div>
+
+    <header class="app-header">
+      <div class="logo-area">
+        <i data-lucide="truck" class="logo-icon"></i>
+        <h1>DELIVERY <span class="accent-text">MATCHER</span></h1>
+      </div>
+      <p class="subtitle">배송원들을 팀으로 매칭하여 지정된 배송 구역에 분할 배정합니다.</p>
+    </header>
+
+    <main class="app-content">
+      
+      <!-- Config Grid (Inputs and Map View) -->
+      <div class="config-grid" id="configGrid">
+        
+        <!-- Left: Input Panel -->
+        <section class="panel input-panel">
+          <div class="panel-header">
+            <i data-lucide="users" class="panel-icon"></i>
+            <h2>배송 요원 & 구역 입력</h2>
+          </div>
+          
+          <div class="panel-body">
+            <!-- Member Input -->
+            <div class="input-group">
+              <label for="memberInput">
+                <span>배송원 이름 입력</span>
+                <span class="badge" id="memberCountBadge">0명</span>
+              </label>
+              <div class="textarea-wrapper">
+                <textarea 
+                  id="memberInput" 
+                  placeholder="이름을 입력하세요 (예: 홍길동, 김철수, 이영희)&#10;한 줄에 한 명씩 입력하거나 쉼표(,)로 구분해서 입력할 수 있습니다."
+                ></textarea>
+              </div>
+              <p class="helper-text">줄바꿈 또는 쉼표(,)로 이름을 구분합니다.</p>
+            </div>
+
+            <!-- Zone Selector Tabs -->
+            <div class="input-group">
+              <label>
+                <span>배송 구역 수 선택</span>
+              </label>
+              <div class="tab-selector">
+                <button type="button" class="tab-btn active" data-zones="5">5구역 모드</button>
+                <button type="button" class="tab-btn" data-zones="6">6구역 모드</button>
+                <button type="button" class="tab-btn" data-zones="7">7구역 모드</button>
+              </div>
+            </div>
+
+            <!-- Zone Name Fields -->
+            <div class="input-group">
+              <label>
+                <span>세부 구역 명칭 수정</span>
+              </label>
+              <div class="zone-inputs-grid" id="zoneInputsGrid">
+                <!-- Dynamically populated via app.js -->
+              </div>
+            </div>
+
+            <!-- Action Button -->
+            <button id="matchBtn" class="btn btn-primary btn-glow">
+              <span class="btn-text">랜덤 매칭 시작!</span>
+              <i data-lucide="sparkles" class="btn-icon"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- Right: Map View Panel -->
+        <section class="panel map-panel">
+          <div class="panel-header">
+            <i data-lucide="map" class="panel-icon"></i>
+            <h2>배송 구역 지도 보기</h2>
+          </div>
+          <div class="map-view-body">
+            <div class="map-image-wrapper">
+              <img id="mapImage" src="assets/map_5zones.jpg" alt="배송 구역 분할 지도">
+            </div>
+            <div class="map-info">
+              <p id="mapDescription">기존 5그룹 배송 기준 지도입니다.</p>
+            </div>
+          </div>
+        </section>
+
+      </div>
+
+      <!-- Match / Animation Panel (Hidden Initially) -->
+      <section id="matchingPanel" class="panel matching-panel hidden">
+        <div class="shuffling-container">
+          <div class="shuffling-radar">
+            <div class="radar-line"></div>
+            <div class="radar-dot"></div>
+          </div>
+          
+          <h3 class="shuffling-title">배송 팀을 생성하고 구역을 배정하는 중...</h3>
+          <p class="shuffling-status">명단을 분석하여 팀을 매칭하고 있습니다.</p>
+          
+          <div class="shuffling-cards-area">
+            <div class="shuffling-card shadow-card-1"><i data-lucide="user"></i></div>
+            <div class="shuffling-card shadow-card-2"><i data-lucide="map-pin"></i></div>
+            <div class="shuffling-card shadow-card-3"><i data-lucide="truck"></i></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Results Panel (Hidden Initially) -->
+      <section id="resultsPanel" class="panel results-panel hidden">
+        <div class="panel-header-results">
+          <div class="title-with-icon">
+            <i data-lucide="check-circle" class="panel-icon-success"></i>
+            <h2>매칭 결과</h2>
+          </div>
+          <div class="results-actions">
+            <button id="retryBtn" class="btn btn-secondary">
+              <i data-lucide="rotate-ccw"></i>
+              <span>다시 매칭</span>
+            </button>
+            <button id="copyBtn" class="btn btn-secondary">
+              <i data-lucide="copy"></i>
+              <span>결과 복사</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Summary Stats -->
+        <div class="stats-summary-results">
+          <div class="stat-card">
+            <span class="stat-label">총 참여 인원</span>
+            <span class="stat-value" id="statTotalUsers">0명</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">생성된 팀 수</span>
+            <span class="stat-value" id="statTotalTeams">0팀</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-label">배정된 구역 수</span>
+            <span class="stat-value" id="statAssignedZones">0개</span>
+          </div>
+        </div>
+
+        <!-- Main side-by-side layout: Map on Left, Seniors on Right -->
+        <div class="results-content-grid">
+          
+          <!-- Left: Map View -->
+          <div class="results-map-area">
+            <div class="map-image-wrapper large-map-wrapper" id="resultsMapWrapper">
+              <img id="resultsMapImage" src="assets/map_5zones.jpg" alt="배송 구역 분할 지도">
+              <div id="mapMarkersContainer"></div>
+            </div>
+          </div>
+
+          <!-- Right: Detailed Seniors Information -->
+          <div class="results-seniors-area">
+            <div class="seniors-list-header">
+              <i data-lucide="heart-handshake" class="seniors-icon"></i>
+              <h3>구역별 배송 & 어르신 정보</h3>
+            </div>
+            <div class="seniors-list" id="resultsSeniorsList">
+              <!-- Dynamically populated via app.js -->
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <footer class="app-footer">
+      <p>© 2026 Delivery Matcher. All rights reserved.</p>
+    </footer>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast hidden">
+    <i data-lucide="info" class="toast-icon"></i>
+    <span id="toastMsg">메시지</span>
+  </div>
+
+  <!-- Custom Javascript -->
+  <script src="app.js"></script>
+</body>
+</html>

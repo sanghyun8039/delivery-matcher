@@ -1,0 +1,15 @@
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Editor / Tool folders
+.claude/
+.gstack/
+.idea/
+.vscode/
+
+# Logs & temp files
+*.log
+*.tmp
