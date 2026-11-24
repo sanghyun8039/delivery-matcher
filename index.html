@@ -61,26 +61,23 @@
             </div>
 
             <!-- Zone Selector Tabs -->
-            <div class="input-group">
+            <div class="input-group" id="zoneSelector">
               <label>
                 <span>배송 구역 수 선택</span>
               </label>
               <div class="tab-selector">
                 <button type="button" class="tab-btn active" data-zones="5">5구역 모드</button>
                 <button type="button" class="tab-btn" data-zones="6">6구역 모드</button>
-                <button type="button" class="tab-btn" data-zones="7">7구역 모드</button>
               </div>
             </div>
 
             <!-- Zone Name Fields -->
-            <div class="input-group">
-              <label>
-                <span>세부 구역 명칭 수정</span>
-              </label>
+            <details class="zone-editor">
+              <summary>세부 구역 명칭 수정</summary>
               <div class="zone-inputs-grid" id="zoneInputsGrid">
                 <!-- Dynamically populated via app.js -->
               </div>
-            </div>
+            </details>
 
             <!-- Action Button -->
             <button id="matchBtn" class="btn btn-primary btn-glow">
@@ -91,7 +88,8 @@
         </section>
 
         <!-- Right: Map View Panel -->
-        <section class="panel map-panel">
+        <details class="panel map-panel" id="mapPanel" open>
+          <summary>배송 구역 지도 보기</summary>
           <div class="panel-header">
             <i data-lucide="map" class="panel-icon"></i>
             <h2>배송 구역 지도 보기</h2>
@@ -101,10 +99,10 @@
               <img id="mapImage" src="assets/map_5zones.jpg" alt="배송 구역 분할 지도">
             </div>
             <div class="map-info">
-              <p id="mapDescription">기존 5그룹 배송 기준 지도입니다.</p>
+              <p id="mapDescription">동일여고와 벽산5단지 일대를 한 구역으로 묶은 5구역 지도입니다.</p>
             </div>
           </div>
-        </section>
+        </details>
 
       </div>
 
@@ -162,18 +160,7 @@
           </div>
         </div>
 
-        <!-- Main side-by-side layout: Map on Left, Seniors on Right -->
         <div class="results-content-grid">
-          
-          <!-- Left: Map View -->
-          <div class="results-map-area">
-            <div class="map-image-wrapper large-map-wrapper" id="resultsMapWrapper">
-              <img id="resultsMapImage" src="assets/map_5zones.jpg" alt="배송 구역 분할 지도">
-              <div id="mapMarkersContainer"></div>
-            </div>
-          </div>
-
-          <!-- Right: Detailed Seniors Information -->
           <div class="results-seniors-area">
             <div class="seniors-list-header">
               <i data-lucide="heart-handshake" class="seniors-icon"></i>
@@ -181,6 +168,13 @@
             </div>
             <div class="seniors-list" id="resultsSeniorsList">
               <!-- Dynamically populated via app.js -->
+            </div>
+          </div>
+
+          <div class="results-map-area">
+            <div class="map-image-wrapper large-map-wrapper" id="resultsMapWrapper">
+              <img id="resultsMapImage" src="assets/map_5zones.jpg" alt="배송 구역 분할 지도">
+              <div id="mapMarkersContainer" aria-hidden="true"></div>
             </div>
           </div>
 
